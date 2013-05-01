@@ -1,7 +1,7 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "Displays better stack trace when your app dies",
    "author" : [
-      "Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-github@titech.ac>"
+      "Charlie Somerville"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v0.2.0, CPAN::Meta::Converter version 2.120921",
@@ -42,6 +42,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Devel::StackTrace::WithLexicals" : "0.10",
+            "JSON" : "2.57",
+            "Plack" : "1.0023",
+            "Term::ANSIColor" : "4.00",
+            "Text::Xslate" : "2.00",
             "perl" : "5.008005"
          }
       },
@@ -52,5 +57,19 @@
       }
    },
    "release_status" : "unstable",
-   "version" : "0.01"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gunyarakun/Plack-Middleware-BetterStackTrace/issues"
+      },
+      "homepage" : "https://github.com/gunyarakun/Plack-Middleware-BetterStackTrace",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gunyarakun/Plack-Middleware-BetterStackTrace.git",
+         "web" : "https://github.com/gunyarakun/Plack-Middleware-BetterStackTrace"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-github@titech.ac>"
+   ]
 }
