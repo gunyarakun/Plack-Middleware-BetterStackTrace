@@ -137,7 +137,6 @@ sub frame_filter {
 
     my @frames = $trace->frames();
     my @filtered_frames;
-    my @variable_info_htmls;
 
     my $context = 'application';
 
@@ -158,6 +157,8 @@ sub frame_filter {
             $context = 'dunno';
         }
 
+        my @args = $next_frame ? $next_frame->args : undef;
+
         push @filtered_frames,
           +{
             context     => $context,
@@ -166,21 +167,18 @@ sub frame_filter {
             method_name => $method_name,
             filename    => $frame->filename,
             line        => $frame->line,
+            info_html   => $tx->render(
+                'variables_info',
+                +{
+                    frame                     => $frame,
+                    args                      => \@args,
+                    html_formatted_code_block => context_html($frame),
+                }
+            ),
           };
-
-        my @args = $next_frame ? $next_frame->args : undef;
-        push @variable_info_htmls,
-          $tx->render(
-            'variables_info',
-            +{
-                frame                     => $frame,
-                args                      => \@args,
-                html_formatted_code_block => context_html($frame),
-            }
-          );
     } ## end for my $i (0 .. $#frames)
 
-    (\@filtered_frames, \@variable_info_htmls);
+    \@filtered_frames;
 } ## end sub frame_filter
 
 sub context_html {
@@ -249,31 +247,18 @@ sub render_html {
         },
         function => {
             dump => $dumper,
-            json => sub {
-                my $target = shift;
-                my $json   = JSON->new->ascii->encode($target);
-                my $bs     = '\\';
-                $json =~ s!/!${bs}/!go;
-                $json =~ s!<!${bs}u003c!go;
-                $json =~ s!>!${bs}u003e!go;
-                $json =~ s!&!${bs}u0026!go;
-                Text::Xslate::mark_raw($json);
-            },
         }
     );
 
     my $request = Plack::Request->new($psgi_env);
-    my ($backtrace_frames, $info_htmls) = frame_filter($trace, $tx, %opt);
+    my $backtrace_frames = frame_filter($trace, $tx, %opt);
 
     return $tx->render(
         'base',
         +{
             backtrace_frames => $backtrace_frames,
-            parameters       => +{
-                info_htmls => $info_htmls,
-            },
-            request => $request,
-            message => $message,
+            request          => $request,
+            message          => $message,
         }
     );
 } ## end sub render_html
@@ -989,14 +974,14 @@ sub base_html {
         </nav>
 
         [% FOREACH frame IN backtrace_frames %]
-            <div class="frame_info" id="frame_info_[% loop.index %]" style="display:none;"></div>
+            <div class="frame_info" id="frame_info_[% loop.index %]" style="display:none;">
+                [% frame.info_html | raw %]
+            </div>
         [% END %]
     </section>
 </body>
 <script>
 (function() {
-    var parameters = [% parameters | json %];
-
     var previousFrame = null;
     var previousFrameInfo = null;
     var allFrames = document.querySelectorAll("ul.frames li");
@@ -1148,7 +1133,6 @@ sub base_html {
             }
 
             el.loaded = true;
-            el.innerHTML = parameters.info_htmls[index];
 
             /*
             var repl = el.querySelector(".repl .console");
