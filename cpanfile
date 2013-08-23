@@ -8,5 +8,8 @@ requires 'Devel::StackTrace::WithLexicals', '0.10';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
-    requires 'Perl::Tidy', '20130806';
 };
+
+on 'develop' => sub {
+    requires 'Perl::Tidy', '20130806';
+}
