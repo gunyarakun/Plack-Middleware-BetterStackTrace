@@ -47,7 +47,8 @@
             "Plack" : "1.0023",
             "Term::ANSIColor" : "4.00",
             "Text::Xslate" : "2.00",
-            "perl" : "5.008005"
+            "perl" : "5.008005",
+            "Try::Thiny":"0.18"
          }
       },
       "test" : {
